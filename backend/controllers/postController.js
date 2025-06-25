@@ -48,4 +48,33 @@ const deletePost = async (req, res) => {
   }
 };
 
-module.exports = { getPosts, createPost, deletePost };
+// @desc    Update a post
+// @route   PUT /api/posts/:id
+// @access  Private/Admin
+const updatePost = async (req, res) => {
+  const { title, content } = req.body;
+
+  try {
+    const post = await Post.findById(req.params.id);
+
+    if (post) {
+      // Check if the user is an admin
+      if (req.user.role !== 'admin') {
+         return res.status(403).json({ message: 'Not authorized to update this post' });
+      }
+
+      post.title = title || post.title;
+      post.content = content || post.content;
+
+      const updatedPost = await post.save();
+      res.json(updatedPost);
+    } else {
+      res.status(404).json({ message: 'Post not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+
+module.exports = { getPosts, createPost, deletePost, updatePost };

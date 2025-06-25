@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
-// Generate JWT
+// Generate JWT (no changes here)
 const generateToken = (id, role) => {
   return jwt.sign({ id, role }, process.env.JWT_SECRET, {
     expiresIn: '30d',
@@ -12,13 +12,33 @@ const generateToken = (id, role) => {
 // @route   POST /api/auth/register
 // @access  Public
 const registerUser = async (req, res) => {
-  const { name, email, password } = req.body;
+  // Destructure new fields from the body
+  const { name, email, password, isAdmin, adminCode } = req.body;
+
   try {
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
     }
-    const user = await User.create({ name, email, password }); // Role defaults to 'user'
+
+    // Determine the user's role based on the signup form
+    let role = 'user';
+    if (isAdmin) {
+      // If the user wants to be an admin, check the secret code
+      if (!adminCode || adminCode !== process.env.ADMIN_SIGNUP_CODE) {
+        return res.status(401).json({ message: 'Invalid Admin Code. Cannot register as Admin.' });
+      }
+      // If the code is valid, set the role to 'admin'
+      role = 'admin';
+    }
+
+    // Create a new user with the determined role
+    const user = await User.create({
+      name,
+      email,
+      password,
+      role, // Set the role dynamically
+    });
 
     if (user) {
       res.status(201).json({
@@ -36,6 +56,8 @@ const registerUser = async (req, res) => {
   }
 };
 
+
+// loginUser and getUserProfile functions remain the same
 // @desc    Auth user & get token
 // @route   POST /api/auth/login
 // @access  Public
@@ -64,7 +86,6 @@ const loginUser = async (req, res) => {
 // @route   GET /api/auth/profile
 // @access  Private
 const getUserProfile = async (req, res) => {
-    // req.user is set by the verifyToken middleware
     if (req.user) {
         res.json({
             _id: req.user._id,
@@ -76,6 +97,5 @@ const getUserProfile = async (req, res) => {
         res.status(404).json({ message: 'User not found' });
     }
 };
-
 
 module.exports = { registerUser, loginUser, getUserProfile };

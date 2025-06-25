@@ -2,7 +2,7 @@
 
 import { createContext, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import api from '@/services/api';
 import toast from 'react-hot-toast';
 
@@ -22,22 +22,26 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('token', data.token);
       api.defaults.headers.Authorization = `Bearer ${data.token}`;
       toast.success('Logged in successfully!');
-      router.push(data.role === 'admin' ? '/admin/dashboard' : '/');
+      // MODIFIED: Redirect to the posts page after login
+      router.push('/posts');
     } catch (error) {
       console.error('Login failed:', error);
       toast.error(error.response?.data?.message || 'Login failed');
     }
   };
 
-  const signup = async (name, email, password) => {
+  // MODIFIED: Updated signup function to handle admin role
+  const signup = async (name, email, password, isAdmin, adminCode) => {
      try {
-      const { data } = await api.post('/auth/register', { name, email, password });
+      // Pass isAdmin and adminCode to the backend
+      const { data } = await api.post('/auth/register', { name, email, password, isAdmin, adminCode });
       setToken(data.token);
       setUser({ name: data.name, email: data.email, role: data.role });
       localStorage.setItem('token', data.token);
       api.defaults.headers.Authorization = `Bearer ${data.token}`;
       toast.success('Signed up successfully!');
-      router.push('/');
+      // MODIFIED: Redirect to the posts page after signup
+      router.push('/posts');
     } catch (error) {
       console.error('Signup failed:', error);
       toast.error(error.response?.data?.message || 'Signup failed');
@@ -61,12 +65,11 @@ export const AuthProvider = ({ children }) => {
         const currentTime = Date.now() / 1000;
         if (decoded.exp > currentTime) {
           setToken(localToken);
-          setUser({ name: decoded.name, email: decoded.email, role: decoded.role });
           api.defaults.headers.Authorization = `Bearer ${localToken}`;
-          // Fetch fresh user profile for up-to-date info
+          // Fetch fresh user profile
           api.get('/auth/profile').then(res => setUser(res.data)).catch(() => logout());
         } else {
-          logout(); // Token expired
+          logout();
         }
       } catch (error) {
          console.error("Invalid token", error);

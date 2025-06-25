@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
-// Generate JWT (no changes here)
+// Generate JWT
 const generateToken = (id, role) => {
   return jwt.sign({ id, role }, process.env.JWT_SECRET, {
     expiresIn: '30d',
@@ -12,7 +12,6 @@ const generateToken = (id, role) => {
 // @route   POST /api/auth/register
 // @access  Public
 const registerUser = async (req, res) => {
-  // Destructure new fields from the body
   const { name, email, password, isAdmin, adminCode } = req.body;
 
   try {
@@ -37,7 +36,7 @@ const registerUser = async (req, res) => {
       name,
       email,
       password,
-      role, // Set the role dynamically
+      role, 
     });
 
     if (user) {

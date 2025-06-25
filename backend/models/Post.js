@@ -14,7 +14,7 @@ const PostSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
-  authorName: { // Denormalizing for easier display
+  authorName: { 
       type: String,
       required: true,
   }

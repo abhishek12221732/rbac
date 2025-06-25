@@ -27,15 +27,18 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
-    if (!loading) {
-      if (!user || user.role !== 'admin') {
-        toast.error('Access Denied. Admins only.');
-        router.push('/login');
-      } else {
-        fetchPosts();
-      }
-    }
-  }, [user, loading, router]);
+  if (loading) return;
+
+  if (!user) {
+    router.push('/login');
+  } else if (user.role !== 'admin') {
+    toast.error('Access Denied. Admins only.');
+    router.push('/login');
+  } else {
+    fetchPosts();
+  }
+}, [user, loading, router]);
+
 
   const handleOpenModalForCreate = () => {
     setCurrentPost(null);

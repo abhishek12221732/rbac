@@ -10,20 +10,19 @@ connectDB();
 
 const app = express();
 
-// CORS configuration to allow requests from your Next.js frontend
 app.use(cors({
-  origin: 'http://localhost:3000', // Your frontend URL
+  origin: 'http://localhost:3000', // Fontend URL
   methods: 'GET,POST,PUT,DELETE',
   credentials: true,
 }));
 
-app.use(express.json()); // to accept json data
+app.use(express.json()); 
 
 app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
-// Mount routers
+
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
 

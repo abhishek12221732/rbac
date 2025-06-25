@@ -6,37 +6,40 @@ import useAuth from '@/hooks/useAuth';
 import api from '@/services/api';
 import PostCard from '@/app/components/client/PostCard';
 import toast from 'react-hot-toast';
+import {useRef} from 'react';
 
 export default function PostsPage() {
+  const hasMounted = useRef(false);
   const [posts, setPosts] = useState([]);
   const [pageLoading, setPageLoading] = useState(true);
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, isLoggingOut } = useAuth();
   const router = useRouter();
+  
 
   useEffect(() => {
-    // Wait until the authentication check is complete
-    if (!authLoading) {
-      // If no user is found, redirect to login
-      if (!user) {
+  if (!authLoading) {
+    if (!user) {
+      // Suppress toast if logout just occurred
+      if (!isLoggingOut.current) {
         toast.error("You must be logged in to view posts.");
-        router.push('/login');
-      } else {
-        // If user is authenticated, fetch posts
-        const fetchPosts = async () => {
-          try {
-            const { data } = await api.get('/posts');
-            setPosts(data);
-          } catch (error) {
-            console.error("Failed to fetch posts:", error);
-            toast.error("Could not fetch posts.");
-          } finally {
-            setPageLoading(false);
-          }
-        };
-        fetchPosts();
       }
+      router.push('/login');
+    } else {
+      const fetchPosts = async () => {
+        try {
+          const { data } = await api.get('/posts');
+          setPosts(data);
+        } catch (error) {
+          toast.error("Could not fetch posts.");
+        } finally {
+          setPageLoading(false);
+        }
+      };
+      fetchPosts();
+      isLoggingOut.current = false; // Reset logout flag once posts are fetched
     }
-  }, [user, authLoading, router]);
+  }
+}, [user, authLoading, router]);
 
   // Show a loading state while checking auth or fetching data
   if (authLoading || pageLoading) {

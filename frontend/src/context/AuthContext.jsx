@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
 import api from '@/services/api';
 import toast from 'react-hot-toast';
+import { useRef } from 'react';
+
 
 const AuthContext = createContext();
 
@@ -13,6 +15,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const isLoggingOut = useRef(false);
 
   const login = async (email, password) => {
     try {
@@ -49,6 +52,7 @@ export const AuthProvider = ({ children }) => {
   }
 
   const logout = useCallback(() => {
+    isLoggingOut.current = true;
     setUser(null);
     setToken(null);
     localStorage.removeItem('token');
@@ -80,7 +84,7 @@ export const AuthProvider = ({ children }) => {
   }, [logout]);
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout, signup }}>
+    <AuthContext.Provider value={{ user, token, loading, login, logout, signup, isLoggingOut }}>
       {!loading && children}
     </AuthContext.Provider>
   );

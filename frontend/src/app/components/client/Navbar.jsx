@@ -14,7 +14,6 @@ export default function Navbar() {
           RBAC Blog
         </Link>
         <div className="flex items-center space-x-4 md:space-x-6">
-          {/* Blog link visible to everyone */}
           <Link href="/posts" className="flex items-center text-gray-600 hover:text-slate-900">
              <BookOpen className="w-5 h-5 mr-1"/> Posts
           </Link>

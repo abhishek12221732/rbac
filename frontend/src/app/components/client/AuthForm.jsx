@@ -8,7 +8,6 @@ export default function AuthForm({ mode }) { // mode can be 'login' or 'signup'
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  // NEW: State for admin registration
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminCode, setAdminCode] = useState('');
 
@@ -19,7 +18,6 @@ export default function AuthForm({ mode }) { // mode can be 'login' or 'signup'
     if (mode === 'login') {
       await login(email, password);
     } else {
-      // Pass the new admin-related state to the signup function
       await signup(name, email, password, isAdmin, adminCode);
     }
   };
@@ -44,7 +42,7 @@ export default function AuthForm({ mode }) { // mode can be 'login' or 'signup'
         <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
       </div>
       
-      {/* NEW: Admin registration fields */}
+      {/* Admin registration fields */}
       {mode === 'signup' && (
         <>
           <div className="flex items-center">

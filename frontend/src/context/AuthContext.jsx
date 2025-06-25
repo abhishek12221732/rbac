@@ -17,6 +17,7 @@ export const AuthProvider = ({ children }) => {
   const router = useRouter();
   const isLoggingOut = useRef(false);
 
+  // login logic
   const login = async (email, password) => {
     try {
       const { data } = await api.post('/auth/login', { email, password });
@@ -25,7 +26,6 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('token', data.token);
       api.defaults.headers.Authorization = `Bearer ${data.token}`;
       toast.success('Logged in successfully!');
-      // MODIFIED: Redirect to the posts page after login
       router.push('/posts');
     } catch (error) {
       console.error('Login failed:', error);
@@ -33,17 +33,15 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // MODIFIED: Updated signup function to handle admin role
+  // signup logic
   const signup = async (name, email, password, isAdmin, adminCode) => {
      try {
-      // Pass isAdmin and adminCode to the backend
       const { data } = await api.post('/auth/register', { name, email, password, isAdmin, adminCode });
       setToken(data.token);
       setUser({ name: data.name, email: data.email, role: data.role });
       localStorage.setItem('token', data.token);
       api.defaults.headers.Authorization = `Bearer ${data.token}`;
       toast.success('Signed up successfully!');
-      // MODIFIED: Redirect to the posts page after signup
       router.push('/posts');
     } catch (error) {
       console.error('Signup failed:', error);
@@ -51,6 +49,7 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
+  // logout logic
   const logout = useCallback(() => {
     isLoggingOut.current = true;
     setUser(null);

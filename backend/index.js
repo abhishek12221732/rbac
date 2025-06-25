@@ -11,7 +11,7 @@ connectDB();
 const app = express();
 
 app.use(cors({
-  origin: 'http://localhost:3000', // Fontend URL
+  origin: ['http://localhost:3000', 'https://rbac-yta0.onrender.com'], // Fontend URL
   methods: 'GET,POST,PUT,DELETE',
   credentials: true,
 }));
